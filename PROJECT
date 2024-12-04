@@ -9,7 +9,7 @@ plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: kueue
-repo: github.com/kubernetes-sigs/kueue-operator
+repo: github.com/kubernetes-sigs/kueue
 resources:
 - api:
     crdVersion: v1beta1
@@ -18,6 +18,6 @@ resources:
   domain: kubernetes-sigs
   group: kubernetes-sigs
   kind: Kueue
-  path: github.com/kubernetes-sigs/kueue-operator/api/v1beta1
+  path: github.com/kubernetes-sigs/kueue/api/v1beta1
   version: v1
 version: "3"

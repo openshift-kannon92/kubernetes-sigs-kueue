@@ -35,7 +35,7 @@ spec:
   maintainers:
   - email: kehannon@redhat.com
     name: kevinhannon
-  maturity: alpha
+  maturity: beta
   provider:
     name: kubernetes-sigs
   version: 0.0.0
