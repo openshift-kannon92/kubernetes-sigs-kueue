@@ -18,8 +18,8 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
+	"github.com/onsi/gomega/types"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -98,7 +98,7 @@ var _ = ginkgo.Describe("ResourceFlavor Webhook", func() {
 		err := k8sClient.Create(ctx, resourceFlavor)
 		if isInvalid {
 			gomega.Expect(err).To(gomega.HaveOccurred())
-			gomega.Expect(errors.IsInvalid(err)).To(gomega.BeTrue(), "error: %v", err)
+			gomega.Expect(err).Should(testing.BeInvalidError())
 		} else {
 			gomega.Expect(err).To(gomega.Succeed())
 			defer func() {
@@ -139,7 +139,66 @@ var _ = ginkgo.Describe("ResourceFlavor Webhook", func() {
 			ginkgo.By("Updating the resourceFlavor with invalid labels")
 			err := k8sClient.Update(ctx, &created)
 			gomega.Expect(err).To(gomega.HaveOccurred())
+<<<<<<< HEAD:test/integration/webhook/resourceflavor_test.go
 			gomega.Expect(errors.IsForbidden(err)).To(gomega.BeTrue(), "error: %v", err)
 		})
 	})
+=======
+			gomega.Expect(err).Should(testing.BeInvalidError())
+		})
+	})
+
+	ginkgo.DescribeTable("Validate resourceFlavor on creation", func(rf *kueue.ResourceFlavor, matcher types.GomegaMatcher) {
+		err := k8sClient.Create(ctx, rf)
+		if err == nil {
+			defer func() {
+				util.ExpectObjectToBeDeleted(ctx, k8sClient, rf, true)
+			}()
+		}
+		gomega.Expect(err).Should(matcher)
+	},
+		ginkgo.Entry("Should fail to create with invalid taints",
+			testing.MakeResourceFlavor("resource-flavor").
+				Taint(corev1.Taint{
+					Key: "skdajf",
+				}).
+				Taint(corev1.Taint{
+					Key:    "@foo",
+					Value:  "bar",
+					Effect: corev1.TaintEffectNoSchedule,
+				}).Obj(),
+			testing.BeInvalidError()),
+		ginkgo.Entry("Should fail to create with invalid label name",
+			testing.MakeResourceFlavor("resource-flavor").NodeLabel("@abc", "foo").Obj(),
+			testing.BeForbiddenError()),
+		ginkgo.Entry("Should fail to create with invalid tolerations",
+			testing.MakeResourceFlavor("resource-flavor").
+				Toleration(corev1.Toleration{
+					Key:      "@abc",
+					Operator: corev1.TolerationOpEqual,
+					Value:    "v",
+					Effect:   corev1.TaintEffectNoSchedule,
+				}).
+				Toleration(corev1.Toleration{
+					Key:      "abc",
+					Operator: corev1.TolerationOpExists,
+					Value:    "v",
+					Effect:   corev1.TaintEffectNoSchedule,
+				}).
+				Toleration(corev1.Toleration{
+					Key:      "abc",
+					Operator: corev1.TolerationOpEqual,
+					Value:    "v",
+					Effect:   "not-valid",
+				}).
+				Toleration(corev1.Toleration{
+					Key:      "abc",
+					Operator: corev1.TolerationOpEqual,
+					Value:    "v",
+					Effect:   corev1.TaintEffectNoSchedule,
+				}).
+				Obj(),
+			testing.BeInvalidError()),
+	)
+>>>>>>> kueue-upstream/main:test/integration/webhook/core/resourceflavor_test.go
 })

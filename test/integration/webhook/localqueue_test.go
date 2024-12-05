@@ -27,6 +27,14 @@ const queueName = "queue-test"
 
 var _ = ginkgo.Describe("Queue validating webhook", func() {
 	ginkgo.When("Updating a Queue", func() {
+<<<<<<< HEAD:test/integration/webhook/localqueue_test.go
+=======
+		ginkgo.It("Should reject bad value for spec.clusterQueue", func() {
+			ginkgo.By("Creating a new Queue")
+			obj := testing.MakeLocalQueue(queueName, ns.Name).ClusterQueue("invalid_name").Obj()
+			gomega.Expect(k8sClient.Create(ctx, obj)).Should(testing.BeInvalidError())
+		})
+>>>>>>> kueue-upstream/main:test/integration/webhook/core/localqueue_test.go
 		ginkgo.It("Should reject the change of spec.clusterQueue", func() {
 			ginkgo.By("Creating a new Queue")
 			obj := testing.MakeLocalQueue(queueName, ns.Name).ClusterQueue("foo").Obj()
