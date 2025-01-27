@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: webhook-service
   namespace: system
+  labels:
+    service.beta.openshift.io/serving-cert-secret-name: kueue-webhook-server-cert
 spec:
   ports:
     - port: 443
