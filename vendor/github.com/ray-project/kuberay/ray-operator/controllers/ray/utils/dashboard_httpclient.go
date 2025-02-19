@@ -474,7 +474,8 @@ func ConvertRayJobToReq(rayJob *rayv1.RayJob) (*RayJobRequest, error) {
 
 func UnmarshalRuntimeEnvYAML(runtimeEnvYAML string) (RuntimeEnvType, error) {
 	var runtimeEnv RuntimeEnvType
-	if err := yaml.Unmarshal([]byte(runtimeEnvYAML), &runtimeEnv); err != nil {
+	err := yaml.Unmarshal([]byte(runtimeEnvYAML), &runtimeEnv)
+	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal RuntimeEnvYAML: %v: %w", runtimeEnvYAML, err)
 	}
 	return runtimeEnv, nil
