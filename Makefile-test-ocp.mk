@@ -20,13 +20,8 @@ LD_FLAGS += -X '$(version_pkg).GitCommit=$(shell git rev-parse HEAD)'
 
 # test flags
 
-<<<<<<< HEAD
 # ENVTEST_OCP_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_OCP_K8S_VERSION ?= 1.32
-=======
-# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION ?= 1.32
->>>>>>> 8606cb473 (add integration ocp test)
 
 # Number of processes to use during integration tests to run specs within a
 # suite in parallel. Suites still run sequentially. User may set this value to 1
@@ -50,7 +45,6 @@ KUSTOMIZE_OCP_VERSION ?= $(shell $(GO_CMD) list -m -mod=mod -f '{{.Version}}' si
 GINKGO_OCP_VERSION ?= $(shell $(GO_CMD) list -m -mod=mod -f '{{.Version}}' github.com/onsi/ginkgo/v2)
 YQ_OCP_VERSION ?= $(shell $(GO_CMD) list -m -mod=mod -f '{{.Version}}' github.com/mikefarah/yq/v4)
 ENVTEST_OCP_VERSION ?= $(shell $(GO_CMD) list -m -mod=mod -f '{{.Version}}' sigs.k8s.io/controller-runtime/tools/setup-envtest)
-GOTESTSUM_OCP_VERSION ?= $(shell $(GO_CMD) list -m -mod=mod -f '{{.Version}}' gotest.tools/gotestsum)
 
 KUSTOMIZE = $(PROJECT_DIR)/bin/kustomize
 .PHONY: kustomize-ocp
@@ -79,6 +73,7 @@ yq-ocp: ## Download yq locally if necessary.
 
 .PHONY: test-ocp
 test-ocp: ## Run tests.
+<<<<<<< HEAD
 # Configs were filtered out due to a failure
 # Running this in openshift CI we are hitting failures in the unit tests
 # due to how kueue grabs the namespace for default configs
@@ -87,15 +82,9 @@ test-ocp: ## Run tests.
 # We added "grep -v 'config'" to filter out those unit tests
 	${GO_CMD} run ./vendor/gotest.tools/gotestsum --junitfile $(ARTIFACTS)/junit.xml -- $(GOFLAGS) $(GO_TEST_FLAGS) $(shell $(GO_CMD) list ./... | grep -v '/test/' | grep -v 'config')
 
-.PHONY: test-integration-ocp
-.PHONY: test-integration-ocp
-test-integration-ocp: envtest-ocp ginkgo-ocp kueuectl-ocp ginkgo-top-ocp ## Run integration tests for all singlecluster suites.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_OCP_K8S_VERSION) --bin-dir $(PROJECT_DIR)/bin -p path)" \
-	PROJECT_DIR=$(PROJECT_DIR)/ \
-	KUEUE_BIN=$(PROJECT_DIR)/bin \
-	ENVTEST_K8S_VERSION=$(ENVTEST_OCP_K8S_VERSION) \
+.PHONY: test-ocp
 test-ocp: gotestsum-ocp ## Run tests.
-	$(GOTESTSUM) --junitfile $(ARTIFACTS)/junit.xml -- $(GOFLAGS) $(GO_TEST_FLAGS) $(shell $(GO_CMD) list ./... | grep -v '/test/') -coverpkg=./... -coverprofile $(ARTIFACTS)/cover.out
+	${GO_CMD} run ./vendor/gotest.tools/gotestsum --junitfile $(ARTIFACTS)/junit.xml -- $(GOFLAGS) $(GO_TEST_FLAGS) $(shell $(GO_CMD) list ./... | grep -v '/test/') -coverpkg=./... -coverprofile $(ARTIFACTS)/cover.out
 
 .PHONY: test-integration-ocp
 test-integration-ocp: envtest-ocp ginkgo-ocp dep-crds-ocp kueuectl-ocp ginkgo-top-ocp ## Run integration tests for all singlecluster suites.
@@ -103,7 +92,6 @@ test-integration-ocp: envtest-ocp ginkgo-ocp dep-crds-ocp kueuectl-ocp ginkgo-to
 	PROJECT_DIR=$(PROJECT_DIR)/ \
 	KUEUE_BIN=$(PROJECT_DIR)/bin \
 	ENVTEST_K8S_VERSION=$(ENVTEST_K8S_VERSION) \
->>>>>>> 5c0de2c6a (add openshift make targets)
 	API_LOG_LEVEL=$(INTEGRATION_API_LOG_LEVEL) \
 	$(GINKGO) $(INTEGRATION_FILTERS) $(GINKGO_ARGS) -procs=$(INTEGRATION_NPROCS) --race --junit-report=junit.xml --json-report=integration.json --output-dir=$(ARTIFACTS) -v $(INTEGRATION_TARGET)
 	$(PROJECT_DIR)/bin/ginkgo-top -i $(ARTIFACTS)/integration.json > $(ARTIFACTS)/integration-top.yaml
