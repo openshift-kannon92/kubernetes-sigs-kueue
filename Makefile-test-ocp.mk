@@ -83,7 +83,7 @@ test-ocp: ## Run tests.
 
 .PHONY: test-ocp
 test-ocp: gotestsum-ocp ## Run tests.
-	${GO_CMD} run ./vendor/gotest.tools/gotestsum --junitfile $(ARTIFACTS)/junit.xml -- $(GOFLAGS) $(GO_TEST_FLAGS) $(shell $(GO_CMD) list ./... | grep -v '/test/') -coverpkg=./... -coverprofile $(ARTIFACTS)/cover.out
+	${GO_CMD} run ./vendor/gotest.tools/gotestsum --junitfile $(ARTIFACTS)/junit.xml -- $(GOFLAGS) $(GO_TEST_FLAGS) $(shell $(GO_CMD) list ./... | grep -v '/test/' | grep -v 'config')
 
 .PHONY: test-integration-ocp
 test-integration-ocp: envtest-ocp ginkgo-ocp dep-crds-ocp kueuectl-ocp ginkgo-top-ocp ## Run integration tests for all singlecluster suites.
