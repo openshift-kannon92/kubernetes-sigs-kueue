@@ -1,7 +1,6 @@
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 EXTERNAL_CRDS_DIR ?= $(PROJECT_DIR)/dep-crds
 ARTIFACTS ?= $(PROJECT_DIR)/bin
-ENVTEST_OCP_VERSION ?= 1.32
 
 ifeq ($(shell uname),Darwin)
     GOFLAGS ?= -ldflags=-linkmode=internal
@@ -89,10 +88,10 @@ test-ocp: gotestsum-ocp ## Run tests.
 .PHONY: test-integration-ocp
 .PHONY: test-integration-ocp
 test-integration-ocp: envtest-ocp ginkgo-ocp kueuectl-ocp ginkgo-top-ocp ## Run integration tests for all singlecluster suites.
-	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_OCP_VERSION) --bin-dir $(PROJECT_DIR)/bin -p path)" \
+	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_OCP_K8S_VERSION) --bin-dir $(PROJECT_DIR)/bin -p path)" \
 	PROJECT_DIR=$(PROJECT_DIR)/ \
 	KUEUE_BIN=$(PROJECT_DIR)/bin \
-	ENVTEST_K8S_VERSION=$(ENVTEST_OCP_VERSION) \
+	ENVTEST_K8S_VERSION=$(ENVTEST_OCP_K8S_VERSION) \
 	API_LOG_LEVEL=$(INTEGRATION_API_LOG_LEVEL) \
 	$(GINKGO) $(INTEGRATION_FILTERS) $(GINKGO_ARGS) -procs=$(INTEGRATION_NPROCS) --race --junit-report=junit.xml --json-report=integration.json --output-dir=$(ARTIFACTS) -v $(INTEGRATION_TARGET)
 	$(PROJECT_DIR)/bin/ginkgo-top -i $(ARTIFACTS)/integration.json > $(ARTIFACTS)/integration-top.yaml
